@@ -1,6 +1,5 @@
 package com.github.donotspampls.velocityutils.commands;
 
-import com.google.inject.Inject;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
@@ -15,13 +14,15 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 
 @SuppressWarnings("deprecation")
-public final class AlertCommand implements Command {
+public class AlertCommand implements Command {
 
-    @Inject
-    private ProxyServer server;
+    private final ProxyServer server;
+    public AlertCommand(ProxyServer server) {
+        this.server = server;
+    }
 
     public void execute(@Nonnull CommandSource source, @Nonnull String[] args) {
-        if (source.hasPermission("velocityutils.use")) {
+        if (source.hasPermission("velocityutils.alert")) {
             if (args.length == 0) {
                 source.sendMessage(TextComponent.builder("You must supply a message.").color(TextColor.RED).build());
             } else {
@@ -44,4 +45,5 @@ public final class AlertCommand implements Command {
             source.sendMessage(TextComponent.builder("You do not have permission to execute this command!").color(TextColor.RED).build());
         }
     }
+
 }
