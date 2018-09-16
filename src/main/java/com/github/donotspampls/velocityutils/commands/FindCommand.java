@@ -29,9 +29,9 @@ public class FindCommand implements Command {
                 if (!player.isPresent()) {
                     source.sendMessage(TextComponent.builder("That user is not online").color(TextColor.RED).build());
                 } else {
-                    Player prplayer = player.get();
-                    String onlineserver = prplayer.getCurrentServer().get().getServerInfo().getName(); // we know it's present
-                    prplayer.sendMessage(ComponentSerializers.LEGACY.deserialize("&e" + prplayer.getUsername() + " &ais online in server &e" + onlineserver, '&'));
+                    Player pl = player.get();
+                    String srv = pl.getCurrentServer().get().getServerInfo().getName();
+                    pl.sendMessage(ComponentSerializers.LEGACY.deserialize("&e" + pl.getUsername() + " &ais online in server &e" + srv, '&'));
                 }
             }
         } else {

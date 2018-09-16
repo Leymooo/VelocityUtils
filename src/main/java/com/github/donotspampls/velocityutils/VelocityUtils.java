@@ -11,7 +11,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
-@Plugin(id = "velocityutils", name = "${project.name}", version = "${project.version}",
+@Plugin(id = "velocityutils", name = "VelocityUtils", version = "1.0.0",
         description = "Useful utility commands for Velocity",
         authors = "DoNotSpamPls")
 @SuppressWarnings("unused")
@@ -27,11 +27,13 @@ public class VelocityUtils {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
+        logger.info("Enabling VelocityUtils version 1.0.0");
+
+        // Register all the commands
         server.getCommandManager().register(new AlertCommand(server), "alert");
         server.getCommandManager().register(new FindCommand(server), "find");
-        server.getCommandManager().register(new ListCommand(server), "list");
+        server.getCommandManager().register(new ListCommand(server), "glist");
         server.getCommandManager().register(new SendCommand(server), "send");
-        logger.info("Enabling VelocityUtils version ${project.version}");
     }
 
 }

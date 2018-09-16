@@ -26,16 +26,14 @@ public class AlertCommand implements Command {
             if (args.length == 0) {
                 source.sendMessage(TextComponent.builder("You must supply a message.").color(TextColor.RED).build());
             } else {
-                // Generate the message
                 StringBuilder builder = new StringBuilder();
                 builder.append(LegacyChatColorUtils.translate('&', "&8[&4Alert&8] &r"));
-                for ( String s : args ) {
+                for (String s : args) {
                     builder.append(LegacyChatColorUtils.translate( '&', s ));
                     builder.append(" ");
                 }
                 @NonNull TextComponent message = ComponentSerializers.LEGACY.deserialize(builder.substring( 0, builder.length() - 1 ));
 
-                // Get all players and send the message
                 Collection<Player> players = server.getAllPlayers();
                 for (Player p : players) {
                     p.sendMessage(message);
