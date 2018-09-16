@@ -32,10 +32,6 @@
             <url>https://repo.velocitypowered.com/snapshots/</url>
         </repository>
         <repository>
-            <id>sponge</id>
-            <url>https://repo.spongepowered.org/maven</url>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -46,11 +42,6 @@
             <groupId>com.github.VelocityPowered</groupId>
             <artifactId>Velocity</artifactId>
             <version>registered-server-e1b2dc0d43-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>configurate-yaml</artifactId>
-            <version>3.6</version>
         </dependency>
     </dependencies>
 
