@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 @Plugin(id = "velocityutils", name = "VelocityUtils", version = "1.0.0",
         description = "Useful utility commands for Velocity",
         authors = "DoNotSpamPls")
-@SuppressWarnings("unused")
 public class VelocityUtils {
+
     private final ProxyServer server;
     private final Logger logger;
 

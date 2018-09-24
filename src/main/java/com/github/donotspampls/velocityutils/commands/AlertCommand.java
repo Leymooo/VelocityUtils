@@ -2,45 +2,33 @@ package com.github.donotspampls.velocityutils.commands;
 
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.util.LegacyChatColorUtils;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import net.kyori.text.serializer.ComponentSerializers;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 
-@SuppressWarnings("deprecation")
 public class AlertCommand implements Command {
 
     private final ProxyServer server;
+
     public AlertCommand(ProxyServer server) {
         this.server = server;
     }
 
+    @Override
     public void execute(@Nonnull CommandSource source, @Nonnull String[] args) {
         if (source.hasPermission("velocityutils.alert")) {
             if (args.length == 0) {
-                source.sendMessage(TextComponent.builder("You must supply a message.").color(TextColor.RED).build());
+                source.sendMessage(TextComponent.of("You must supply a message.", TextColor.RED));
             } else {
-                StringBuilder builder = new StringBuilder();
-                builder.append(LegacyChatColorUtils.translate('&', "&8[&4Alert&8] &r"));
-                for (String s : args) {
-                    builder.append(LegacyChatColorUtils.translate( '&', s ));
-                    builder.append(" ");
-                }
-                @NonNull TextComponent message = ComponentSerializers.LEGACY.deserialize(builder.substring( 0, builder.length() - 1 ));
-
-                Collection<Player> players = server.getAllPlayers();
-                for (Player p : players) {
-                    p.sendMessage(message);
-                }
+                String message = String.join(" ", args);
+                TextComponent component = ComponentSerializers.LEGACY.deserialize("&8[&4Alert&8] &r" + message, '&');
+                server.broadcast(component);
             }
         } else {
-            source.sendMessage(TextComponent.builder("You do not have permission to execute this command!").color(TextColor.RED).build());
+            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
         }
     }
 

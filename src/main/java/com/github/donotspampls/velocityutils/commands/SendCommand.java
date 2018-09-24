@@ -11,12 +11,12 @@ import net.kyori.text.serializer.ComponentSerializers;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import java.util.Optional;
+import net.kyori.text.Component;
 
-@SuppressWarnings({"deprecation", "OptionalGetWithoutIsPresent"})
 public class SendCommand implements Command {
 
     private final ProxyServer server;
+
     public SendCommand(ProxyServer server) {
         this.server = server;
     }
@@ -25,46 +25,50 @@ public class SendCommand implements Command {
     public void execute(@NonNull CommandSource source, String[] args) {
         if (source.hasPermission("velocityutils.send")) {
             if (args.length != 2) {
-                source.sendMessage(TextComponent.builder("Not enough arguments. Usage: /send <player|current|all> <target>").color(TextColor.RED).build());
-            } else if (args[0].equals("all")) {
-                Optional<RegisteredServer> sendserver = server.getServerInfo(args[1]);
-                Collection<Player> players = server.getAllPlayers();
-                for (Player p : players) {
-                    if (sendserver.isPresent()) {
-                        RegisteredServer prserver = sendserver.get();
-                        p.createConnectionRequest(prserver).connect();
-                        p.sendMessage(ComponentSerializers.LEGACY.deserialize("&aYou were summoned to &e" + prserver.getServerInfo().getName() + " &aby an administrator.", '&'));
-                    } else {
-                        source.sendMessage(TextComponent.builder("The server you've chosen does not exist!").color(TextColor.RED).build());
+                source.sendMessage(TextComponent.of("Not enough arguments. Usage: /send <player|current|all> <target>", TextColor.RED));
+                return;
+            }
+
+            RegisteredServer target = server.getServer(args[1]).orElse(null);
+            if (target == null) {
+                source.sendMessage(TextComponent.of("The server you've chosen does not exist!", TextColor.RED));
+                return;
+            }
+
+            Component summoned = ComponentSerializers.LEGACY.deserialize("&aYou were summoned to &e" + target.getServerInfo().getName() + " &aby an administrator.", '&');
+
+            switch (args[0].toLowerCase()) {
+                case "all":
+                    server.getAllPlayers().forEach(p -> p.createConnectionRequest(target).connect());
+                    server.broadcast(summoned);
+                    break;
+                case "current":
+                    if (!(source instanceof Player)) {
+                        source.sendMessage(TextComponent.of("You are not player!", TextColor.RED));
+                        break;
                     }
-                }
-            } else if (args[0].equals("current")) {
-                Player player = (Player) source;
-                Optional<RegisteredServer> sendserver = server.getServerInfo(args[1]);
-                Collection<Player> players = player.getCurrentServer().get().getServer().getPlayersConnected();
-                for (Player p : players) {
-                    if (sendserver.isPresent()) {
-                        RegisteredServer prserver = sendserver.get();
-                        p.createConnectionRequest(prserver).connect();
-                        p.sendMessage(ComponentSerializers.LEGACY.deserialize("&aYou were summoned to &e" + prserver.getServerInfo().getName() + " &aby an administrator.", '&'));
-                    } else {
-                        source.sendMessage(TextComponent.builder("The server you've chosen does not exist!").color(TextColor.RED).build());
+                    Player player = (Player) source;
+                    Collection<Player> players = player.getCurrentServer().get().getServer().getPlayersConnected();
+                    for (Player p : players) {
+                        p.createConnectionRequest(target).connect();
+                        p.sendMessage(summoned);
                     }
-                }
-            } else {
-                Optional<RegisteredServer> sendserver = server.getServerInfo(args[1]);
-                Optional<Player> player = server.getPlayer(args[0]);
-                if (player.isPresent() && sendserver.isPresent()) {
-                    RegisteredServer prserver = sendserver.get();
-                    Player prplayer = player.get();
-                    prplayer.createConnectionRequest(sendserver.get()).connect();
-                    prplayer.sendMessage(ComponentSerializers.LEGACY.deserialize("&aYou were summoned to &e" + prserver.getServerInfo().getName() + " &aby an administrator.", '&'));
-                } else {
-                    source.sendMessage(TextComponent.builder("Either the player or the server you've chosen does not exist!").color(TextColor.RED).build());
-                }
+                    break;
+                case "player":
+                    player = server.getPlayer(args[0]).orElse(null);
+                    if (player != null) {
+                        player.createConnectionRequest(target).connect();
+                        player.sendMessage(summoned);
+                    } else {
+                        source.sendMessage(TextComponent.of("Either the player you've chosen does not exist!", TextColor.RED));
+                    }
+                    break;
+                default:
+                    source.sendMessage(TextComponent.of("Usage: /send <player|current|all> <target>", TextColor.RED));
+                    break;
             }
         } else {
-            source.sendMessage(TextComponent.builder("You do not have permission to execute this command!").color(TextColor.RED).build());
+            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
         }
     }
 
