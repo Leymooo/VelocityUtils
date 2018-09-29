@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 @Plugin(id = "velocityutils", name = "VelocityUtils", version = "1.0.0",
         description = "Useful utility commands for Velocity",
         authors = "DoNotSpamPls")
+@SuppressWarnings("unused")
 public class VelocityUtils {
 
     private final ProxyServer server;
@@ -27,7 +28,7 @@ public class VelocityUtils {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
-        logger.info("Enabling VelocityUtils version 1.0.0");
+        logger.info("Enabling VelocityUtils version 1.0.1");
 
         // Register all the commands
         server.getCommandManager().register(new AlertCommand(server), "alert");

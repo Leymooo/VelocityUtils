@@ -9,6 +9,7 @@ import net.kyori.text.serializer.ComponentSerializers;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("deprecation")
 public class AlertCommand implements Command {
 
     private final ProxyServer server;

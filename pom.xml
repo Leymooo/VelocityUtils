@@ -6,7 +6,7 @@
 
     <groupId>com.github.donotspampls</groupId>
     <artifactId>velocityutils</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>VelocityUtils</name>
@@ -30,10 +30,6 @@
         <repository>
             <id>velocity-repo</id>
             <url>https://repo.velocitypowered.com/snapshots/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 

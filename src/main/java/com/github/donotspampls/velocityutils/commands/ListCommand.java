@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class ListCommand implements Command {
 
     private final ProxyServer server;
@@ -26,7 +27,7 @@ public class ListCommand implements Command {
         if (source.hasPermission("velocityutils.list")) {
             for (RegisteredServer srv : server.getAllServers()) {
                 List<String> players = srv.getPlayersConnected().stream().map(Player::getUsername).sorted().collect(Collectors.toList());
-                String playersString = players.stream().collect(Collectors.joining(", "));
+                String playersString = String.join(", ", players);
                 source.sendMessage(ComponentSerializers.LEGACY.deserialize("&a[" + srv.getServerInfo().getName() + "] &e(" + players.size() + "): &r" + playersString, '&'));
             }
             source.sendMessage(TextComponent.of("Total players online: " + server.getPlayerCount()));

@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Optional;
 
+@SuppressWarnings("deprecation")
 public class FindCommand implements Command {
 
     private final ProxyServer server;

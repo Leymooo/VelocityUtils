@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collection;
 import net.kyori.text.Component;
 
+@SuppressWarnings("deprecation")
 public class SendCommand implements Command {
 
     private final ProxyServer server;
@@ -48,23 +49,20 @@ public class SendCommand implements Command {
                         break;
                     }
                     Player player = (Player) source;
-                    Collection<Player> players = player.getCurrentServer().get().getServer().getPlayersConnected();
+                    Collection<Player> players = player.getCurrentServer().get().getServer().getPlayersConnected(); // we know the server exists
                     for (Player p : players) {
                         p.createConnectionRequest(target).connect();
                         p.sendMessage(summoned);
                     }
                     break;
-                case "player":
+                default:
                     player = server.getPlayer(args[0]).orElse(null);
                     if (player != null) {
                         player.createConnectionRequest(target).connect();
                         player.sendMessage(summoned);
                     } else {
-                        source.sendMessage(TextComponent.of("Either the player you've chosen does not exist!", TextColor.RED));
+                        source.sendMessage(TextComponent.of("The player you've chosen does not exist!", TextColor.RED));
                     }
-                    break;
-                default:
-                    source.sendMessage(TextComponent.of("Usage: /send <player|current|all> <target>", TextColor.RED));
                     break;
             }
         } else {
