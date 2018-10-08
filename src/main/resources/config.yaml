@@ -1,0 +1,7 @@
+alert:
+  prefix: "&8[&4Alert&8] &r"
+  nopermission: "&4You do not have permission to execute this command!"
+
+find:
+  nopermission: "&4You do not have permission to execute this command!"
+
