@@ -25,14 +25,18 @@ import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
  * @author satish
  */
 public class ConfigParser {
-
+	/**
+	 * Name of the config file
+	 */
+	public static final String CONFIG_FILE_NAME = "config.yaml";
+	
 	/**
 	 * Parse the config file and return the configuration
 	 * 
 	 * @return {@link Configuration}
 	 * @throws Exception
 	 */
-	public static Configuration parseConfig() throws Exception {
+	public static Configuration parseConfig(InputStream configStream) throws Exception {
 		TypeSerializerCollection serializers = TypeSerializers.getDefaultSerializers().newChild();
 		serializers.registerType(TypeToken.of(AlertConfig.class), new AlertConfigSerializer());
 		serializers.registerType(TypeToken.of(FindConfig.class), new FindConfigSerializer());
@@ -40,34 +44,32 @@ public class ConfigParser {
 		ConfigurationOptions configOptions = ConfigurationOptions.defaults();
 		configOptions = configOptions.setSerializers(serializers);
 		
-		try (InputStream configStream = ConfigParser.class.getResourceAsStream("/config.yaml")) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(configStream, StandardCharsets.UTF_8.name()));
-			Callable<BufferedReader> readerCallable = new Callable<BufferedReader>() {
-				/*
-				 * (non-Javadoc)
-				 * @see java.util.concurrent.Callable#call()
-				 */
-				@Override
-				public BufferedReader call() throws Exception {
-					return reader;
-				}
-			};
-			
-			YAMLConfigurationLoader loader = YAMLConfigurationLoader.builder().setSource(readerCallable).build();
-			ConfigurationNode node = loader.load(configOptions);
-			
-			ConfigurationNode alertConfigNode = node.getNode("alert");
-			AlertConfig alertConfig = alertConfigNode.getValue(TypeToken.of(AlertConfig.class));
-			
-			ConfigurationNode findConfigNode = node.getNode("find");
-			FindConfig findConfig = findConfigNode.getValue(TypeToken.of(FindConfig.class));
-			
-			return new ConfigurationImpl(alertConfig, findConfig);
-		}
+		BufferedReader reader = new BufferedReader(new InputStreamReader(configStream, StandardCharsets.UTF_8.name()));
+		Callable<BufferedReader> readerCallable = new Callable<BufferedReader>() {
+			/*
+			 * (non-Javadoc)
+			 * @see java.util.concurrent.Callable#call()
+			 */
+			@Override
+			public BufferedReader call() throws Exception {
+				return reader;
+			}
+		};
+		
+		YAMLConfigurationLoader loader = YAMLConfigurationLoader.builder().setSource(readerCallable).build();
+		ConfigurationNode node = loader.load(configOptions);
+		
+		ConfigurationNode alertConfigNode = node.getNode("alert");
+		AlertConfig alertConfig = alertConfigNode.getValue(TypeToken.of(AlertConfig.class));
+		
+		ConfigurationNode findConfigNode = node.getNode("find");
+		FindConfig findConfig = findConfigNode.getValue(TypeToken.of(FindConfig.class));
+		
+		return new ConfigurationImpl(alertConfig, findConfig);
 	}
 
 	public static void main(String[] args) throws Exception {
-		Configuration configuration = parseConfig();
+		Configuration configuration = parseConfig(ConfigParser.class.getResourceAsStream("/" + CONFIG_FILE_NAME));
 		AlertConfig alertConfig = configuration.getAlertConfig();
 		FindConfig findConfig = configuration.getFindConfig();
 		
