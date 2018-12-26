@@ -33,7 +33,7 @@ public class FindCommand implements Command {
                 } else {
                     Player pl = player.get();
                     Optional<ServerConnection> server = pl.getCurrentServer();
-                    server.ifPresent(srv -> pl.sendMessage(ComponentSerializers.LEGACY.deserialize("&e" + pl.getUsername() + " &ais online in server &e" + srv.getServerInfo().getName(), '&')));
+                    server.ifPresent(srv -> source.sendMessage(ComponentSerializers.LEGACY.deserialize("&e" + pl.getUsername() + " &ais online in server &e" + srv.getServerInfo().getName(), '&')));
                 }
             }
         } else {
