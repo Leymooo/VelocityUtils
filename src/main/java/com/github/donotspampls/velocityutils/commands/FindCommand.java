@@ -1,5 +1,6 @@
 package com.github.donotspampls.velocityutils.commands;
 
+import com.github.donotspampls.velocityutils.VelocityUtils;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
@@ -15,10 +16,12 @@ import java.util.Optional;
 @SuppressWarnings("deprecation")
 public class FindCommand implements Command {
 
+    private final VelocityUtils plugin;
     private final ProxyServer server;
 
-    public FindCommand(ProxyServer server) {
-        this.server = server;
+    public FindCommand(VelocityUtils plugin) {
+        this.plugin = plugin;
+        server = plugin.getServer();
     }
 
     @Override
@@ -37,7 +40,7 @@ public class FindCommand implements Command {
                 }
             }
         } else {
-            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(plugin.getConfig().getStringOption("find", "no_permission"), '&'));
         }
     }
 

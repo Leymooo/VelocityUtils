@@ -1,5 +1,6 @@
 package com.github.donotspampls.velocityutils.commands;
 
+import com.github.donotspampls.velocityutils.VelocityUtils;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -12,10 +13,12 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("deprecation")
 public class AlertCommand implements Command {
 
+    private final VelocityUtils plugin;
     private final ProxyServer server;
 
-    public AlertCommand(ProxyServer server) {
-        this.server = server;
+    public AlertCommand(VelocityUtils plugin) {
+        this.plugin = plugin;
+        server = plugin.getServer();
     }
 
     @Override
@@ -25,11 +28,11 @@ public class AlertCommand implements Command {
                 source.sendMessage(TextComponent.of("You must supply a message.", TextColor.RED));
             } else {
                 String message = String.join(" ", args);
-                TextComponent component = ComponentSerializers.LEGACY.deserialize("&8[&4Alert&8] &r" + message, '&');
+                TextComponent component = ComponentSerializers.LEGACY.deserialize(plugin.getConfig().getStringOption("alert", "prefix") + message, '&');
                 server.broadcast(component);
             }
         } else {
-            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(plugin.getConfig().getStringOption("alert", "no_permission"), '&'));
         }
     }
 
