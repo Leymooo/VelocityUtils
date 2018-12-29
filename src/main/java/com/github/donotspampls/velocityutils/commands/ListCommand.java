@@ -1,13 +1,16 @@
 package com.github.donotspampls.velocityutils.commands;
 
+import com.github.donotspampls.velocityutils.ConfigManager;
+import com.github.donotspampls.velocityutils.VelocityUtils;
+
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
+
 import net.kyori.text.serializer.ComponentSerializers;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
@@ -17,22 +20,29 @@ import java.util.stream.Collectors;
 public class ListCommand implements Command {
 
     private final ProxyServer server;
+    private final ConfigManager config;
 
-    public ListCommand(ProxyServer server) {
-        this.server = server;
+    public ListCommand(VelocityUtils plugin) {
+        this.server = plugin.getProxyServer();
+        this.config = plugin.getConfigManager();
     }
 
     @Override
-    public void execute(@NonNull CommandSource source, String[] args) {
-        if (source.hasPermission("velocityutils.list")) {
+    public void execute(@NonNull CommandSource source, @NonNull String[] args) {
+        if (source.hasPermission(config.getString("list", "permission")) && config.getBoolean("list", "enabled")) {
             for (RegisteredServer srv : server.getAllServers()) {
                 List<String> players = srv.getPlayersConnected().stream().map(Player::getUsername).sorted().collect(Collectors.toList());
                 String playersString = String.join(", ", players);
-                source.sendMessage(ComponentSerializers.LEGACY.deserialize("&a[" + srv.getServerInfo().getName() + "] &e(" + players.size() + "): &r" + playersString, '&'));
+                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("list", "response"
+                        .replace("{0}", srv.getServerInfo().getName())
+                        .replace("{1}", String.valueOf(players.size()))
+                        .replace("{2}", playersString)
+                ), '&'));
             }
-            source.sendMessage(TextComponent.of("Total players online: " + server.getPlayerCount()));
-        } else {
-            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(
+                    config.getString("list", "total_players")
+                            .replace("{0}", String.valueOf(server.getPlayerCount()))
+                    , '&'));
         }
     }
 }

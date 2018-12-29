@@ -1,11 +1,13 @@
 package com.github.donotspampls.velocityutils.commands;
 
+import com.github.donotspampls.velocityutils.ConfigManager;
 import com.github.donotspampls.velocityutils.VelocityUtils;
+
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
 import net.kyori.text.serializer.ComponentSerializers;
 
 import javax.annotation.Nonnull;
@@ -13,26 +15,24 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("deprecation")
 public class AlertCommand implements Command {
 
-    private final VelocityUtils plugin;
     private final ProxyServer server;
+    private final ConfigManager config;
 
     public AlertCommand(VelocityUtils plugin) {
-        this.plugin = plugin;
-        server = plugin.getServer();
+        this.server = plugin.getProxyServer();
+        this.config = plugin.getConfigManager();
     }
 
     @Override
     public void execute(@Nonnull CommandSource source, @Nonnull String[] args) {
-        if (source.hasPermission("velocityutils.alert")) {
+        if (source.hasPermission(config.getString("alert", "permission")) && config.getBoolean("alert", "enabled")) {
             if (args.length == 0) {
-                source.sendMessage(TextComponent.of("You must supply a message.", TextColor.RED));
+                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("alert", "no_message"), '&'));
             } else {
                 String message = String.join(" ", args);
-                TextComponent component = ComponentSerializers.LEGACY.deserialize(plugin.getConfig().getStringOption("alert", "prefix") + message, '&');
+                TextComponent component = ComponentSerializers.LEGACY.deserialize(config.getString("alert", "prefix") + message, '&');
                 server.broadcast(component);
             }
-        } else {
-            source.sendMessage(ComponentSerializers.LEGACY.deserialize(plugin.getConfig().getStringOption("alert", "no_permission"), '&'));
         }
     }
 

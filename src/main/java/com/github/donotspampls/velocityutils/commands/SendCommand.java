@@ -1,42 +1,47 @@
 package com.github.donotspampls.velocityutils.commands;
 
+import com.github.donotspampls.velocityutils.ConfigManager;
+import com.github.donotspampls.velocityutils.VelocityUtils;
+
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
+
+import net.kyori.text.Component;
 import net.kyori.text.serializer.ComponentSerializers;
+
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
-import net.kyori.text.Component;
 
 @SuppressWarnings("deprecation")
 public class SendCommand implements Command {
 
     private final ProxyServer server;
+    private final ConfigManager config;
 
-    public SendCommand(ProxyServer server) {
-        this.server = server;
+    public SendCommand(VelocityUtils plugin) {
+        this.server = plugin.getProxyServer();
+        this.config = plugin.getConfigManager();
     }
 
     @Override
-    public void execute(@NonNull CommandSource source, String[] args) {
-        if (source.hasPermission("velocityutils.send")) {
+    public void execute(@NonNull CommandSource source, @NonNull String[] args) {
+        if (source.hasPermission(config.getString("send", "permission")) && config.getBoolean("send", "enabled")) {
             if (args.length != 2) {
-                source.sendMessage(TextComponent.of("Not enough arguments. Usage: /send <player|current|all> <target>", TextColor.RED));
+                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("send", "usage"), '&'));
                 return;
             }
 
             RegisteredServer target = server.getServer(args[1]).orElse(null);
             if (target == null) {
-                source.sendMessage(TextComponent.of("The server you've chosen does not exist!", TextColor.RED));
+                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("send", "no_server"), '&'));
                 return;
             }
 
-            Component summoned = ComponentSerializers.LEGACY.deserialize("&aYou were summoned to &e" + target.getServerInfo().getName() + " &aby an administrator.", '&');
+            Component summoned = ComponentSerializers.LEGACY.deserialize(config.getString("send", "no_server").replace("{0}", target.getServerInfo().getName()), '&');
 
             switch (args[0].toLowerCase()) {
                 case "all":
@@ -45,7 +50,7 @@ public class SendCommand implements Command {
                     break;
                 case "current":
                     if (!(source instanceof Player)) {
-                        source.sendMessage(TextComponent.of("You are not player!", TextColor.RED));
+                        source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("send", "not_player"), '&'));
                         break;
                     }
                     Player player = (Player) source;
@@ -61,12 +66,10 @@ public class SendCommand implements Command {
                         player.createConnectionRequest(target).connect();
                         player.sendMessage(summoned);
                     } else {
-                        source.sendMessage(TextComponent.of("The player you've chosen does not exist!", TextColor.RED));
+                        source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("send", "no_player"), '&'));
                     }
                     break;
             }
-        } else {
-            source.sendMessage(TextComponent.of("You do not have permission to execute this command!", TextColor.RED));
         }
     }
 
