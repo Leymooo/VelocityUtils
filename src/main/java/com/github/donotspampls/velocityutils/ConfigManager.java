@@ -35,75 +35,35 @@ public class ConfigManager {
      * Beware: large methods ahead (object mappers are even more stupid than this)
      */
     private void addAlertValues() {
-        if (parent.getNode("alert", "enabled").isVirtual()) {
-            parent.getNode("alert", "enabled").setValue(true);
-        }
-        if (parent.getNode("alert", "permission").isVirtual()) {
-            parent.getNode("alert", "permission").setValue("velocityutils.alert");
-        }
-        if (parent.getNode("alert", "prefix").isVirtual()) {
-            parent.getNode("alert", "prefix").setValue("&8[&4Alert&8] &r");
-        }
-        if (parent.getNode("alert", "no_message").isVirtual()) {
-            parent.getNode("alert", "no_message").setValue("&4You must supply a message.");
-        }
+        addNode("alert", "enabled", true);
+        addNode("alert", "permission", "velocityutils.alert");
+        addNode("alert", "prefix", "&8[&4Alert&8] &r");
+        addNode("alert", "no_message", "&4You must supply a message.");
     }
 
     private void addFindValues() {
-        if (parent.getNode("find", "enabled").isVirtual()) {
-            parent.getNode("find", "enabled").setValue(true);
-        }
-        if (parent.getNode("find", "permission").isVirtual()) {
-            parent.getNode("find", "permission").setValue("velocityutils.find");
-        }
-        if (parent.getNode("find", "no_username").isVirtual()) {
-            parent.getNode("find", "no_username").setValue("&4Please follow this command by a user name");
-        }
-        if (parent.getNode("find", "user_offline").isVirtual()) {
-            parent.getNode("find", "user_offline").setValue("&4That user is not online");
-        }
-        if (parent.getNode("find", "response").isVirtual()) {
-            parent.getNode("find", "response").setValue("&e{0} &ais online in server &e{1}");
-        }
+        addNode("find", "enabled", true);
+        addNode("find", "permission", "velocityutils.find");
+        addNode("find", "no_username", "&4Please follow this command by a user name");
+        addNode("find", "user_offline", "&4That user is not online");
+        addNode("find", "response", "&e{0} &ais online in server &e{1}");
     }
 
     private void addListValues() {
-        if (parent.getNode("list", "enabled").isVirtual()) {
-            parent.getNode("list", "enabled").setValue(true);
-        }
-        if (parent.getNode("list", "permission").isVirtual()) {
-            parent.getNode("list", "permission").setValue("velocityutils.list");
-        }
-        if (parent.getNode("list", "response").isVirtual()) {
-            parent.getNode("list", "response").setValue("&a[{0}] &e({1}): {2}");
-        }
-        if (parent.getNode("list", "total_players").isVirtual()) {
-            parent.getNode("list", "total_players").setValue("&fTotal players online: {0}");
-        }
+        addNode("list", "enabled", true);
+        addNode("list", "permission", "velocityutils.list");
+        addNode("list", "response", "&a[{0}] &e({1}): {2}");
+        addNode("list", "total_players", "&fTotal players online: {0}");
     }
 
     private void addSendValues() {
-        if (parent.getNode("send", "enabled").isVirtual()) {
-            parent.getNode("send", "enabled").setValue(true);
-        }
-        if (parent.getNode("send", "permission").isVirtual()) {
-            parent.getNode("send", "permission").setValue("velocityutils.send");
-        }
-        if (parent.getNode("send", "usage").isVirtual()) {
-            parent.getNode("send", "usage").setValue("&4Not enough arguments. Usage: /send <player|current|all> <target>");
-        }
-        if (parent.getNode("send", "summoned").isVirtual()) {
-            parent.getNode("send", "summoned").setValue("&aYou were summoned to &e{0} &aby an administrator.");
-        }
-        if (parent.getNode("send", "no_server").isVirtual()) {
-            parent.getNode("send", "no_server").setValue("&4The server you've chosen does not exist!");
-        }
-        if (parent.getNode("send", "not_player").isVirtual()) {
-            parent.getNode("send", "not_player").setValue("&4You are not a player!");
-        }
-        if (parent.getNode("send", "no_player").isVirtual()) {
-            parent.getNode("send", "no_player").setValue("&4The player you've chosen does not exist!");
-        }
+        addNode("send", "enabled", true);
+        addNode("send", "permission", "velocityutils.send");
+        addNode("send", "usage", "&4Not enough arguments. Usage: /send <player|current|all> <target>");
+        addNode("send", "summoned", "&aYou were summoned to &e{0} &aby an administrator.");
+        addNode("send", "no_server", "&4The server you've chosen does not exist!");
+        addNode("send", "not_player", "&4You are not a player!");
+        addNode("send", "no_player", "&4The player you've chosen does not exist!");
     }
 
     void reload() {
@@ -120,5 +80,11 @@ public class ConfigManager {
 
     public Boolean getBoolean(Object... nodes) {
         return parent.getNode(nodes).getBoolean();
+    }
+    
+    private void addNode(String section, String key, Object value) {
+        if (parent.getNode(section, key).isVirtual()) {
+            parent.getNode(section, key).setValue(value);
+        }
     }
 }
