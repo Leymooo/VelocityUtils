@@ -1,6 +1,6 @@
 package com.github.donotspampls.velocityutils.commands;
 
-import com.github.donotspampls.velocityutils.ConfigManager;
+import com.github.donotspampls.velocityutils.config.ConfigManager;
 import com.github.donotspampls.velocityutils.VelocityUtils;
 
 import com.velocitypowered.api.command.Command;
@@ -25,15 +25,18 @@ public class AlertCommand implements Command {
 
     @Override
     public void execute(@Nonnull CommandSource source, @Nonnull String[] args) {
-        if (source.hasPermission(config.getString("alert", "permission")) && config.getBoolean("alert", "enabled")) {
-            if (args.length == 0) {
-                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("alert", "no_message"), '&'));
-            } else {
-                String message = String.join(" ", args);
-                TextComponent component = ComponentSerializers.LEGACY.deserialize(config.getString("alert", "prefix") + message, '&');
-                server.broadcast(component);
-            }
+        if (args.length == 0) {
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("alert", "no_message"), '&'));
+        } else {
+            String message = String.join(" ", args);
+            TextComponent component = ComponentSerializers.LEGACY.deserialize(config.getString("alert", "prefix") + message, '&');
+            server.broadcast(component);
         }
+    }
+
+    @Override
+    public boolean hasPermission(CommandSource source, String[] args) {
+        return config.getBoolean("alert", "enabled") && source.hasPermission(config.getString("alert", "permission"));
     }
 
 }

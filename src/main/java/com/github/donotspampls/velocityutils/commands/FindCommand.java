@@ -1,6 +1,6 @@
 package com.github.donotspampls.velocityutils.commands;
 
-import com.github.donotspampls.velocityutils.ConfigManager;
+import com.github.donotspampls.velocityutils.config.ConfigManager;
 import com.github.donotspampls.velocityutils.VelocityUtils;
 
 import com.velocitypowered.api.command.Command;
@@ -28,24 +28,27 @@ public class FindCommand implements Command {
 
     @Override
     public void execute(@NonNull CommandSource source, @NonNull String[] args) {
-        if (source.hasPermission(config.getString("find", "permission")) && config.getBoolean("find", "enabled")) {
-            if (args.length == 0) {
-                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("find", "no_username"), '&'));
+        if (args.length == 0) {
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("find", "no_username"), '&'));
+        } else {
+            Optional<Player> player = server.getPlayer(args[0]);
+            if (!player.isPresent()) {
+                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("alert", "user_offline"), '&'));
             } else {
-                Optional<Player> player = server.getPlayer(args[0]);
-                if (!player.isPresent()) {
-                    source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("alert", "user_offline"), '&'));
-                } else {
-                    Player p = player.get();
-                    Optional<ServerConnection> server = p.getCurrentServer();
-                    server.ifPresent(srv -> source.sendMessage(ComponentSerializers.LEGACY.deserialize(
-                            config.getString("find", "response")
-                                    .replace("{0}", p.getUsername())
-                                    .replace("{1}", srv.getServerInfo().getName()), '&')
-                    ));
-                }
+                Player p = player.get();
+                Optional<ServerConnection> server = p.getCurrentServer();
+                server.ifPresent(srv -> source.sendMessage(ComponentSerializers.LEGACY.deserialize(
+                        config.getString("find", "response")
+                                .replace("{0}", p.getUsername())
+                                .replace("{1}", srv.getServerInfo().getName()), '&')
+                ));
             }
         }
+    }
+
+    @Override
+    public boolean hasPermission(CommandSource source, String[] args) {
+        return config.getBoolean("find", "enabled") && source.hasPermission(config.getString("find", "permission"));
     }
 
 }

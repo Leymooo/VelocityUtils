@@ -1,34 +1,18 @@
-package com.github.donotspampls.velocityutils;
+package com.github.donotspampls.velocityutils.config;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
-import org.yaml.snakeyaml.DumperOptions;
-
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
-public class ConfigManager {
+public class MainConfig extends ConfigManager {
 
-    private ConfigurationNode parent;
-    private File configFile;
+    public MainConfig(Path dataDirectory) {
+        super(dataDirectory, "config.yml");
 
-    ConfigManager(Path dataDirectory, String configName) {
-        try {
-            configFile = new File(dataDirectory.toFile(), configName);
-            ConfigurationLoader<ConfigurationNode> config = YAMLConfigurationLoader.builder().setFlowStyle(DumperOptions.FlowStyle.BLOCK).setFile(configFile).build();
-            this.parent = config.load();
-
-            addAlertValues();
-            addFindValues();
-            addListValues();
-            addSendValues();
-
-            config.save(parent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        addAlertValues();
+        addFindValues();
+        addListValues();
+        addSendValues();
+        addSaveServerValues();
+        super.save();
     }
 
     /*
@@ -66,25 +50,7 @@ public class ConfigManager {
         addNode("send", "no_player", "&4The player you've chosen does not exist!");
     }
 
-    void reload() {
-        try {
-            this.parent = YAMLConfigurationLoader.builder().setFile(configFile).build().load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getString(Object... nodes) {
-        return parent.getNode(nodes).getString();
-    }
-
-    public Boolean getBoolean(Object... nodes) {
-        return parent.getNode(nodes).getBoolean();
-    }
-    
-    private void addNode(String section, String key, Object value) {
-        if (parent.getNode(section, key).isVirtual()) {
-            parent.getNode(section, key).setValue(value);
-        }
+    private void addSaveServerValues() {
+        addNode("save-last-server", "enabled", false);
     }
 }

@@ -1,6 +1,6 @@
 package com.github.donotspampls.velocityutils.commands;
 
-import com.github.donotspampls.velocityutils.ConfigManager;
+import com.github.donotspampls.velocityutils.config.ConfigManager;
 import com.github.donotspampls.velocityutils.VelocityUtils;
 
 import com.velocitypowered.api.command.Command;
@@ -29,20 +29,23 @@ public class ListCommand implements Command {
 
     @Override
     public void execute(@NonNull CommandSource source, @NonNull String[] args) {
-        if (source.hasPermission(config.getString("list", "permission")) && config.getBoolean("list", "enabled")) {
-            for (RegisteredServer srv : server.getAllServers()) {
-                List<String> players = srv.getPlayersConnected().stream().map(Player::getUsername).sorted().collect(Collectors.toList());
-                String playersString = String.join(", ", players);
-                source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("list", "response"
-                        .replace("{0}", srv.getServerInfo().getName())
-                        .replace("{1}", String.valueOf(players.size()))
-                        .replace("{2}", playersString)
-                ), '&'));
-            }
-            source.sendMessage(ComponentSerializers.LEGACY.deserialize(
-                    config.getString("list", "total_players")
-                            .replace("{0}", String.valueOf(server.getPlayerCount()))
-                    , '&'));
+        for (RegisteredServer srv : server.getAllServers()) {
+            List<String> players = srv.getPlayersConnected().stream().map(Player::getUsername).sorted().collect(Collectors.toList());
+            String playersString = String.join(", ", players);
+            source.sendMessage(ComponentSerializers.LEGACY.deserialize(config.getString("list", "response")
+                    .replace("{0}", srv.getServerInfo().getName())
+                    .replace("{1}", String.valueOf(players.size()))
+                    .replace("{2}", playersString),
+                    '&'));
         }
+        source.sendMessage(ComponentSerializers.LEGACY.deserialize(
+                config.getString("list", "total_players")
+                        .replace("{0}", String.valueOf(server.getPlayerCount())), '&'));
     }
+
+    @Override
+    public boolean hasPermission(CommandSource source, String[] args) {
+        return config.getBoolean("list", "enabled") && source.hasPermission(config.getString("list", "permission"));
+    }
+
 }
